@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="author" content="Navdeep Singh" />
+  <title>Dinner Booking</title>
+  <style>
+    body {
+      font-family: Arial;
+      margin: 20px;
+    }
+    input:invalid {
+      border-color: red;
+    }
+    .error {
+      color: red;
+      font-size: 0.9em;
+    }
+    input.valid {
+      border-color: initial;
+    }
+    #summary {
+      margin-top: 20px;
+      font-weight: bold;
+      background: #f0f0f0;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Booking place for your dinner!</h2>
+
+<form id="bookingForm">
+  <label>Name:</label><br />
+  <input type="text" id="name" /><br />
+  <span class="error" id="nameError"></span><br />
+
+  <label>Phone number:</label><br />
+  <input type="text" id="phone" /><br />
+  <span class="error" id="phoneError"></span><br />
+
+  <p>Select a time:</p>
+  <input type="radio" name="time" value="05:00" checked /> 05:00<br />
+  <input type="radio" name="time" value="06:00" /> 06:00<br />
+  <input type="radio" name="time" value="07:00" /> 07:00<br />
+  <input type="radio" name="time" value="08:00" /> 08:00<br />
+
+  <p>What would you like to have with us?</p>
+  <input type="checkbox" name="extras" value="Starters" /> Starters<br />
+  <input type="checkbox" name="extras" value="Main Course" /> Main Course<br />
+  <input type="checkbox" name="extras" value="Desserts" /> Desserts<br />
+  <input type="checkbox" name="extras" value="Drinks" /> Drinks<br /><br />
+
+  <button type="submit" id="submitBtn" disabled>Submit</button>
+</form>
+
+<!-- Summary output -->
+<div id="summary"></div>
+
+<script>
+  const nameInput = document.getElementById("name");
+  const phoneInput = document.getElementById("phone");
+  const submitBtn = document.getElementById("submitBtn");
+  const nameError = document.getElementById("nameError");
+  const phoneError = document.getElementById("phoneError");
+  const summaryDiv = document.getElementById("summary");
+
+  function validateName() {
+    const name = nameInput.value.trim();
+    const parts = name.split(" ").filter(w => w.length > 0);
+    if (parts.length < 2) {
+      nameError.textContent = "Error: First and last names are required.";
+      nameInput.classList.remove("valid");
+      return false;
+    }
+    nameError.textContent = "";
+    nameInput.classList.add("valid");
+    return true;
+  }
+
+  function validatePhone() {
+    const phone = phoneInput.value.trim();
+    if (!/^[0-9]{8}$/.test(phone)) {
+      phoneError.textContent = "Error: Phone number must be exactly 8 digits.";
+      phoneInput.classList.remove("valid");
+      return false;
+    }
+    phoneError.textContent = "";
+    phoneInput.classList.add("valid");
+    return true;
+  }
+
+  function validateForm() {
+    const isNameValid = validateName();
+    const isPhoneValid = validatePhone();
+    submitBtn.disabled = !(isNameValid && isPhoneValid);
+  }
+
+  nameInput.addEventListener("input", validateForm);
+  phoneInput.addEventListener("input", validateForm);
+
+  document.getElementById("bookingForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    if (!validateName() || !validatePhone()) return;
+
+    const name = nameInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const time = document.querySelector('input[name="time"]:checked').value;
+
+    const extras = Array.from(document.querySelectorAll('input[name="extras"]:checked'))
+                        .map(el => el.value);
+    const extrasText = extras.length > 0 ? extras.join(", ") : "No extras selected";
+
+    summaryDiv.innerHTML = `
+      Name: ${name}<br>
+      Phone: ${phone}<br>
+      Time: ${time}<br>
+      Extras: ${extrasText}
+    `;
+  });
+</script>
+
+</body>
+</html>
